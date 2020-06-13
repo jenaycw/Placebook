@@ -31,7 +31,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient:FusedLocationProviderClient
     private lateinit var placesClient: PlacesClient
-    private val mapsViewModel by viewModels<MapsViewModel>()
+    private lateinit var mapsViewModel: MapsViewModel
+//    private val mapsViewModel by viewModels<MapsViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -57,13 +58,13 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
         }
 
         mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
-        private fun setupMapListeners() { mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
-            map.setOnPoiClickListener {
+
+    }
+    private fun setupMapListeners() { mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
+        mMap.setOnPoiClickListener {
             displayPoi(it)
         }
-        }
     }
-
 
     private fun setupPlacesClient(){
         Places.initialize(getApplicationContext(),
