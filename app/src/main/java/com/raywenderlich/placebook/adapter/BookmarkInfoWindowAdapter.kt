@@ -8,6 +8,7 @@ import android.widget.TextView
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.model.Marker
 import com.raywenderlich.placebook.R
+import com.raywenderlich.placebook.ui.MapsActivity
 
 class BookmarkInfoWindowAdapter(context: Activity): GoogleMap.InfoWindowAdapter {
     private val contents: View
@@ -26,6 +27,7 @@ class BookmarkInfoWindowAdapter(context: Activity): GoogleMap.InfoWindowAdapter 
         titleView.text = marker.title ?:""
         val phoneView = contents.findViewById<TextView>(R.id.phone)
         phoneView.text = marker.snippet ?:""
+
 
 
 
