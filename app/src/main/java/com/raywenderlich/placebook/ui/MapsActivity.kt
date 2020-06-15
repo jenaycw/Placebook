@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Toast
+import androidx.activity.viewModels
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.common.api.ApiException
 import com.google.android.gms.location.*
@@ -31,8 +32,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private lateinit var mMap: GoogleMap
     private lateinit var fusedLocationClient:FusedLocationProviderClient
     private lateinit var placesClient: PlacesClient
-    private lateinit var mapsViewModel: MapsViewModel
-//    private val mapsViewModel by viewModels<MapsViewModel>()
+    private val mapsViewModel by viewModels<MapsViewModel>()
+
+
+
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -50,6 +53,7 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
+        setupMapListeners()
         getCurrentLocation()
 
         mMap.setOnPoiClickListener{
@@ -63,6 +67,10 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     private fun setupMapListeners() { mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
         mMap.setOnPoiClickListener {
             displayPoi(it)
+        }
+        mMap.setOnInfoWindowClickListener{
+            handleInfoWindowClick(it)
+
         }
     }
 
@@ -231,9 +239,19 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
 
         )
-        marker?.tag = photo
+        marker?.tag = PlaceInfo(place, photo)
     }
+    class PlaceInfo(val place:Place? = null,
+    val image:Bitmap? = null)
 
+    private fun handleInfoWindowClick (marker: Marker){
+        val placeInfo = (marker.tag as PlaceInfo)
+        if (placeInfo.place != null){
+            mapsViewModel.addBookmarkFromPlace(placeInfo.place,
+            placeInfo.image)
+        }
+        marker.remove()
+    }
 }
 
 
