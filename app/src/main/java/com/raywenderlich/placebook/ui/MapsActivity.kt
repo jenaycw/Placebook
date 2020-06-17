@@ -53,7 +53,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
     override fun onMapReady(googleMap: GoogleMap) {
 
         mMap = googleMap
-        setupMapListeners()
         getCurrentLocation()
 
         mMap.setOnPoiClickListener{
@@ -63,15 +62,6 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
 
-    }
-    private fun setupMapListeners() { mMap.setInfoWindowAdapter(BookmarkInfoWindowAdapter(this))
-        mMap.setOnPoiClickListener {
-            displayPoi(it)
-        }
-        mMap.setOnInfoWindowClickListener{
-            handleInfoWindowClick(it)
-
-        }
     }
 
     private fun setupPlacesClient(){
@@ -141,32 +131,8 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
 
         }
 
-    private fun displayPoi(pointOfInterest: PointOfInterest){
-        val placeId = pointOfInterest.placeId
-        val request = displayPoiGetPlaceStep(pointOfInterest)
-
-        val placeFields = listOf(Place.Field.ID,
-        Place.Field.NAME,
-            Place.Field.PHONE_NUMBER,
-            Place.Field.PHOTO_METADATAS,
-            Place.Field.ADDRESS,
-            Place.Field.LAT_LNG
-        )
-
-        placesClient.fetchPlace(request)
-            .addOnSuccessListener { response ->
-                val place = response.place
-                Toast.makeText(this, "${place.name},"+
-                "${place.phoneNumber}",
-                Toast.LENGTH_LONG).show()
-            }.addOnFailureListener{exception ->
-                if(exception is ApiException){
-                    val statusCode = exception.statusCode
-                    Log.e(
-                        TAG,"Place not found: "+ exception.message + "," + "statusCode" + statusCode
-                    )
-                }
-            }
+    private fun displayPoi(pointOfInterest: PointOfInterest) {
+        displayPoiGetPlaceStep(pointOfInterest)
     }
 
     private fun displayPoiGetPlaceStep(pointOfInterest: PointOfInterest): FetchPlaceRequest {
@@ -184,17 +150,25 @@ class MapsActivity : AppCompatActivity(), OnMapReadyCallback {
             .builder(placeId, placeFields)
             .build()
         placesClient.fetchPlace(request)
-            .addOnSuccessListener { response -> val place = response.place
-            Toast.makeText(this,
-                "${place.name},"+
-                        "${place.phoneNumber}",
-                Toast.LENGTH_LONG).show()}
-            .addOnFailureListener { exception -> if (exception is ApiException){
-                val statusCode = exception.statusCode
-                Log.e(
-                    TAG,
-                    "Place not found:"+ exception.message + ","+ "statusCode:"+statusCode)
-            } }
+            .addOnSuccessListener { response ->
+                val place = response.place
+                displayPoiGetPhotoStep(place)
+                Toast.makeText(
+                    this,
+                    "${place.name}," +
+                            "${place.phoneNumber}",
+                    Toast.LENGTH_LONG
+                ).show()
+            }
+            .addOnFailureListener { exception ->
+                if (exception is ApiException) {
+                    val statusCode = exception.statusCode
+                    Log.e(
+                        TAG,
+                        "Place not found:" + exception.message + "," + "statusCode:" + statusCode
+                    )
+                }
+            }
         return request
     }
     private fun displayPoiGetPhotoStep(place:Place){
